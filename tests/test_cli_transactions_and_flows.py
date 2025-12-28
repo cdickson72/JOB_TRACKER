@@ -113,3 +113,45 @@ def test_cli_add_status_remove_flow(session, runner):
     assert result3.exit_code == 0
     job_after = session.query(Job).filter(Job.id == job_id).first()
     assert job_after is None
+
+
+def test_job_url_saved_as_string(session, runner):
+    runner = CliRunner()
+    result = runner.invoke(
+        app,
+        [
+            "job",
+            "add",
+            "--company",
+            "URLCo",
+            "--title",
+            "Engineer",
+            "--source",
+            "Manual",
+            "--applied-date",
+            "2025-01-01",
+            "--resume-id",
+            "none",
+            "--cover-letter-id",
+            "none",
+            "--location",
+            "remote",
+            "--salary-range",
+            "$60,000 - $80,000",
+            "--job-url",
+            "https://example.com",
+        ],
+    )
+
+    assert result.exit_code == 0, result.stdout
+    # find the created job and assert job_url is stored as a string
+    out = result.stdout
+    m = re.search(r"ID:\s*([0-9a-fA-F-]{36})", out)
+    assert m, f"Could not find ID in output: {out}"
+    job_id = m.group(1)
+
+    job = session.query(Job).filter(Job.id == job_id).first()
+    assert job is not None
+    assert isinstance(job.job_url, str)
+    # HttpUrl may normalize to include a trailing slash; accept either form
+    assert job.job_url.rstrip("/") == "https://example.com"

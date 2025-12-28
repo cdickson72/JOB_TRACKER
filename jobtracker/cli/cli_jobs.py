@@ -8,6 +8,8 @@ from jobtracker.db import get_db
 from sqlalchemy.orm import joinedload
 from jobtracker.models import Job, Resume, CoverLetter
 from jobtracker.enums import JobStatus
+from jobtracker.schemas import JobCreate, JobUpdate
+from pydantic import ValidationError
 
 console = Console()
 job_app = typer.Typer(help="Manage tracked job applications: add, list, update, status, note, remove")
@@ -120,16 +122,31 @@ def add_job(
         if not cover_letter_id:
             cover_letter_id = _select_cover_letter_id(db)
 
+        # Validate inputs using Pydantic schema which normalizes salary_range
+        try:
+            job_in = JobCreate(
+                company=company,
+                title=title,
+                location=location,
+                salary_range=salary_range,
+                job_url=job_url,
+                source=source,
+            )
+        except ValidationError as exc:
+            console.print(f"[red]Invalid input:[/red] {exc}")
+            raise typer.Exit(code=1)
+
         # -----------------------------
         # Create Job
         # -----------------------------
         job = Job(
-            company=company,
-            title=title,
-            source=source,
-            job_url=job_url,
-            location=location,
-            salary_range=salary_range,
+            company=job_in.company,
+            title=job_in.title,
+            source=job_in.source,
+            # Pydantic HttpUrl converts to an object; ensure we store a string in the DB
+            job_url=str(job_in.job_url) if job_in.job_url else (job_url or None),
+            location=job_in.location,
+            salary_range=job_in.salary_range,
             status=JobStatus.APPLIED.value,
             applied_date=applied_dt,
             last_updated=now,
@@ -155,6 +172,27 @@ def update_job(job_id: str = typer.Argument(..., help="ID of the job to update")
 
         # Update basic fields
         _prompt_update_basic_fields(job)
+
+        # Validate updates using JobUpdate schema (salary_range normalization/validation)
+        try:
+            job_up = JobUpdate(
+                company=job.company,
+                title=job.title,
+                location=job.location,
+                salary_range=job.salary_range,
+                job_url=job.job_url,
+                source=job.source,
+            )
+        except ValidationError as exc:
+            console.print(f"[red]Invalid update:[/red] {exc}")
+            raise typer.Exit(code=1)
+
+        # Apply any normalized values (e.g., salary_range)
+        if job_up.salary_range is not None:
+            job.salary_range = job_up.salary_range
+        # Ensure job_url gets stored as a string (JobUpdate may contain a HttpUrl)
+        if job_up.job_url is not None:
+            job.job_url = str(job_up.job_url)
 
         # Update Resume
         _prompt_update_resume(db, job)

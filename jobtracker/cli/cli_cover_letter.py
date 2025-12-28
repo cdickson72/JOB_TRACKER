@@ -6,6 +6,8 @@ from rich.table import Table
 from rich import box
 from jobtracker.db import get_db
 from jobtracker.models import CoverLetter
+from jobtracker.schemas import CoverLetterCreate
+from pydantic import ValidationError
 
 console = Console()
 cover_letter_app = typer.Typer(help="Manage cover letters: add, list, update, remove")
@@ -23,6 +25,13 @@ def add_cover_letter(
     tags: Optional[str] = typer.Option(None, prompt=True),
 ):
     """Add a cover letter to the catalog"""
+    # Validate inputs
+    try:
+        CoverLetterCreate(name=name, file_path=file_path, tags=tags)
+    except ValidationError as exc:
+        console.print(f"[red]Invalid input:[/red] {exc}")
+        raise typer.Exit(code=1)
+
     with get_db() as db:
         cl = CoverLetter(name=name, file_path=file_path, tags=tags, created_at=datetime.now(timezone.utc))
         try:
@@ -77,6 +86,11 @@ def update_cover_letter(
             cl.tags = tags
             updated = True
         if file_path is not None:
+            try:
+                CoverLetterCreate(name=cl.name, file_path=file_path, tags=cl.tags)
+            except ValidationError as exc:
+                console.print(f"[red]Invalid file_path:[/red] {exc}")
+                raise typer.Exit(code=1)
             cl.file_path = file_path
             updated = True
         if not updated:

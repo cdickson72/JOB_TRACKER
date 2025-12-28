@@ -6,6 +6,8 @@ from rich.table import Table
 from rich import box
 from jobtracker.db import get_db
 from jobtracker.models import Resume
+from jobtracker.schemas import ResumeCreate
+from pydantic import ValidationError
 
 console = Console()
 resume_app = typer.Typer(help="Manage resumes: add, list, update, remove")
@@ -23,6 +25,13 @@ def add_resume(
     tags: Optional[str] = typer.Option(None, prompt=True),
 ):
     """Add a resume to the catalog"""
+    # Validate input early using Pydantic schema
+    try:
+        ResumeCreate(name=name, file_path=file_path, tags=tags)
+    except ValidationError as exc:
+        console.print(f"[red]Invalid input:[/red] {exc}")
+        raise typer.Exit(code=1)
+
     with get_db() as db:
         resume = Resume(name=name, file_path=file_path, tags=tags, created_at=datetime.now(timezone.utc))
         try:
@@ -71,16 +80,24 @@ def update_resume(
         if not resume:
             console.print(f"Resume ID {resume_id} not found")
             raise typer.Exit()
-    updated = False
-    if name is not None:
-        resume.name = name
-        updated = True
-    if tags is not None:
-        resume.tags = tags
-        updated = True
-    if file_path is not None:
-        resume.file_path = file_path
-        updated = True
+
+        updated = False
+        if name is not None:
+            resume.name = name
+            updated = True
+        if tags is not None:
+            resume.tags = tags
+            updated = True
+        if file_path is not None:
+            # Validate file_path
+            try:
+                ResumeCreate(name=resume.name, file_path=file_path, tags=resume.tags)
+            except ValidationError as exc:
+                console.print(f"[red]Invalid file_path:[/red] {exc}")
+                raise typer.Exit(code=1)
+            resume.file_path = file_path
+            updated = True
+
         if not updated:
             console.print("No fields provided to update")
             raise typer.Exit()
