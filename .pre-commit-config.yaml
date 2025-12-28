@@ -3,7 +3,10 @@ repos:
     rev: 24.10.0
     hooks:
       - id: black
-        language_version: python3.10
+        # Use a generic `python3` language_version so pre-commit doesn't try to
+        # create a venv using a specific minor interpreter that may not exist
+        # on the matrix runner (e.g., python3.12 runner may not have python3.10).
+        language_version: python3
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     # Use a valid tag for the upstream pre-commit repo; some revs may not exist
