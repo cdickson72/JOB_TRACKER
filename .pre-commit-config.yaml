@@ -6,7 +6,8 @@ repos:
         language_version: python3.10
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.26.2"
+    # Use a valid tag for the upstream pre-commit repo; some revs may not exist
+    rev: "v0.14.10"
     hooks:
       - id: ruff
         args: ["--fix"]
