@@ -96,6 +96,7 @@ def _commit_job(db, job: Job) -> None:
         db.rollback()
         raise
 
+
 @job_app.command("add")
 def add_job(
     company: str = typer.Option(..., prompt=True),
@@ -235,9 +236,7 @@ def _prompt_update_basic_fields(job: Job) -> None:
     applied_input = typer.prompt("Applied Date (YYYY-MM-DD)", default=applied_default)
     if applied_input.strip():
         try:
-            job.applied_date = datetime.strptime(applied_input.strip(), "%Y-%m-%d").replace(
-                tzinfo=timezone.utc
-            )
+            job.applied_date = datetime.strptime(applied_input.strip(), "%Y-%m-%d").replace(tzinfo=timezone.utc)
         except ValueError:
             console.print("[red]Invalid date format. Keeping current value.[/red]")
 
@@ -272,6 +271,8 @@ def _prompt_update_cover_letter(db, job: Job) -> None:
     cover_default = job.cover_letter_id if job.cover_letter else ""
     cover_selected = typer.prompt("Enter cover letter ID to attach", default=cover_default)
     job.cover_letter_id = cover_selected if cover_selected else job.cover_letter_id
+
+
 @job_app.command("remove")
 def remove_job(job_id: str = typer.Argument(...)):
     """Remove a job from tracking"""
