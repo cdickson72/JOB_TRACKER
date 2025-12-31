@@ -1,0 +1,50 @@
+NiceGUI ready to go on http://localhost:8080, http://10.0.0.240:8080, and http://169.254.39.172:8080
+DEBUG jobs: change_status_selected called
+Invalid value: rejected
+Traceback (most recent call last):
+  File "/Users/camerondickson/Library/Python/3.9/lib/python/site-packages/nicegui/events.py", line 442, in handle_event
+    result = cast(Callable[[], Any], handler)()
+  File "/Users/camerondickson/Documents/Job_Tracker/jobtracker/gui/jobs/views.py", line 244, in change_status_selected
+    status_select = ui.select(options=status_options, label='Status', value=job.status)
+  File "/Users/camerondickson/Library/Python/3.9/lib/python/site-packages/nicegui/elements/select.py", line 64, in __init__
+    super().__init__(label=label, options=options, value=value, on_change=on_change, validation=validation)
+  File "/Users/camerondickson/Library/Python/3.9/lib/python/site-packages/nicegui/elements/mixins/label_element.py", line 14, in __init__
+    super().__init__(**kwargs)
+  File "/Users/camerondickson/Library/Python/3.9/lib/python/site-packages/nicegui/elements/mixins/validation_element.py", line 19, in __init__
+    super().__init__(**kwargs)
+  File "/Users/camerondickson/Library/Python/3.9/lib/python/site-packages/nicegui/elements/choice_element.py", line 20, in __init__
+    raise ValueError(f'Invalid value: {value}')
+ValueError: Invalid value: rejected
+DEBUG jobs: open_update_dialog called
+DEBUG jobs: (update) resume_options= [{'label': 'Common Citizens', 'value': 'aa435d87-bbac-457d-a58b-02edb337b36d'}, {'label': 'Technical Support', 'value': '3571f7d5-1964-4784-be98-7dcb36e37626'}, {'label': 'Merative', 'value': '6f56e45d-843c-4d2d-98c4-5445354c23db'}, {'label': 'Progessive', 'value': '4f3d0606-133b-4006-96aa-0232ce41c8b1'}, {'label': 'Technical Support/Helpdesk', 'value': '47e83207-1ca9-4578-8f2c-1bbb6091479c'}, {'label': '120825 pdf', 'value': '271258c7-b5cc-467b-85fe-196a95285a24'}]
+DEBUG jobs: (update) job.resume_id= None type= <class 'NoneType'>
+DEBUG jobs: open_add_dialog called
+DEBUG jobs: resume_options= [{'label': 'Common Citizens', 'value': 'aa435d87-bbac-457d-a58b-02edb337b36d'}, {'label': 'Technical Support', 'value': '3571f7d5-1964-4784-be98-7dcb36e37626'}, {'label': 'Merative', 'value': '6f56e45d-843c-4d2d-98c4-5445354c23db'}, {'label': 'Progessive', 'value': '4f3d0606-133b-4006-96aa-0232ce41c8b1'}, {'label': 'Technical Support/Helpdesk', 'value': '47e83207-1ca9-4578-8f2c-1bbb6091479c'}, {'label': '120825 pdf', 'value': '271258c7-b5cc-467b-85fe-196a95285a24'}]
+DEBUG jobs: resume default value= aa435d87-bbac-457d-a58b-02edb337b36d type= <class 'str'>
+WARNING:  WatchFiles detected changes in 'jobtracker/gui/app.py'. Reloading...
+NiceGUI ready to go on http://localhost:8080, http://10.0.0.240:8080, and http://169.254.39.172:8080
+WARNING:  WatchFiles detected changes in 'jobtracker/gui/app.py'. Reloading...
+NiceGUI ready to go on http://localhost:8080, http://10.0.0.240:8080, and http://169.254.39.172:8080
+DEBUG jobs: open_add_dialog called
+DEBUG jobs: resume_options= [{'label': 'Common Citizens', 'value': 'aa435d87-bbac-457d-a58b-02edb337b36d'}, {'label': 'Technical Support', 'value': '3571f7d5-1964-4784-be98-7dcb36e37626'}, {'label': 'Merative', 'value': '6f56e45d-843c-4d2d-98c4-5445354c23db'}, {'label': 'Progessive', 'value': '4f3d0606-133b-4006-96aa-0232ce41c8b1'}, {'label': 'Technical Support/Helpdesk', 'value': '47e83207-1ca9-4578-8f2c-1bbb6091479c'}, {'label': '120825 pdf', 'value': '271258c7-b5cc-467b-85fe-196a95285a24'}]
+DEBUG jobs: resume default value= aa435d87-bbac-457d-a58b-02edb337b36d type= <class 'str'>
+WARNING:  WatchFiles detected changes in 'jobtracker/gui/app.py'. Reloading...
+NiceGUI ready to go on http://localhost:8080, http://10.0.0.240:8080, and http://169.254.39.172:8080
+WARNING:  WatchFiles detected changes in 'jobtracker/gui/jobs/views.py'. Reloading...
+NiceGUI ready to go on http://localhost:8080, http://10.0.0.240:8080, and http://169.254.39.172:8080
+WARNING:  WatchFiles detected changes in 'jobtracker/gui/resumes/views.py'. Reloading...
+NiceGUI ready to go on http://localhost:8080, http://10.0.0.240:8080, and http://169.254.39.172:8080
+WARNING:  WatchFiles detected changes in 'jobtracker/gui/cover_letters/views.py'. Reloading...
+NiceGUI ready to go on http://localhost:8080, http://10.0.0.240:8080, and http://169.254.39.172:8080
+WARNING:  WatchFiles detected changes in 'jobtracker/gui/notes/views.py'. Reloading...
+NiceGUI ready to go on http://localhost:8080, http://10.0.0.240:8080, and http://169.254.39.172:8080
+WARNING:  WatchFiles detected changes in 'jobtracker/gui/resumes/views.py'. Reloading...
+NiceGUI ready to go on http://localhost:8080, http://10.0.0.240:8080, and http://169.254.39.172:8080
+WARNING:  WatchFiles detected changes in 'jobtracker/gui/resumes/views.py'. Reloading...
+NiceGUI ready to go on http://localhost:8080, http://10.0.0.240:8080, and http://169.254.39.172:8080
+WARNING:  WatchFiles detected changes in 'jobtracker/gui/resumes/views.py'. Reloading...
+NiceGUI ready to go on http://localhost:8080, http://10.0.0.240:8080, and http://169.254.39.172:8080
+WARNING:  WatchFiles detected changes in 'jobtracker/gui/resumes/views.py'. Reloading...
+NiceGUI ready to go on http://localhost:8080, http://10.0.0.240:8080, and http://169.254.39.172:8080
+WARNING:  WatchFiles detected changes in 'jobtracker/gui/resumes/views.py'. Reloading...
+NiceGUI ready to go on http://localhost:8080, http://10.0.0.240:8080, and http://169.254.39.172:8080

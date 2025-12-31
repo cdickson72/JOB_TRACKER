@@ -9,6 +9,7 @@ from sqlalchemy.orm import joinedload
 from jobtracker.models import Job, Resume, CoverLetter
 from jobtracker.enums import JobStatus
 from jobtracker.schemas import JobCreate, JobUpdate
+from jobtracker.core.job_actions import create_job as core_create_job, update_job as core_update_job, list_jobs as core_list_jobs, delete_job as core_delete_job
 from pydantic import ValidationError
 
 console = Console()
@@ -114,53 +115,37 @@ def add_job(
     """Add a new job application"""
     now = datetime.now(timezone.utc)
     with get_db() as db:
-        applied_dt = _parse_applied_date(applied_date, now)
+        # Parse date
+        if applied_date:
+            try:
+                applied_dt = datetime.strptime(applied_date.strip(), "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            except ValueError:
+                applied_dt = now
+        else:
+            applied_dt = now
 
         if not resume_id:
             resume_id = _select_resume_id(db)
-
         if not cover_letter_id:
             cover_letter_id = _select_cover_letter_id(db)
 
-        # Validate inputs using Pydantic schema which normalizes salary_range
-        try:
-            job_in = JobCreate(
-                company=company,
-                title=title,
-                location=location,
-                salary_range=salary_range,
-                job_url=job_url,
-                source=source,
-            )
-        except ValidationError as exc:
-            console.print(f"[red]Invalid input:[/red] {exc}")
-            raise typer.Exit(code=1)
-
-        # -----------------------------
-        # Create Job
-        # -----------------------------
-        job = Job(
-            company=job_in.company,
-            title=job_in.title,
-            source=job_in.source,
-            # Pydantic HttpUrl converts to an object; ensure we store a string in the DB
-            job_url=str(job_in.job_url) if job_in.job_url else (job_url or None),
-            location=job_in.location,
-            salary_range=job_in.salary_range,
-            status=JobStatus.APPLIED.value,
+        job = core_create_job(
+            db,
+            company=company,
+            title=title,
+            source=source,
+            job_url=job_url,
+            location=location,
+            salary_range=salary_range,
             applied_date=applied_dt,
-            last_updated=now,
-            created_at=now,
             resume_id=resume_id,
-            cover_letter_id=cover_letter_id,
+            cover_letter_id=cover_letter_id
         )
 
-        _create_and_commit_job(db, job)
         _print_added_job_details(db, job, resume_id, cover_letter_id)
 
-
 @job_app.command("update")
-def update_job(job_id: str = typer.Argument(..., help="ID of the job to update")):
+def update_job(job_id: str = typer.Argument(...)):
     """Update fields on an existing job"""
     with get_db() as db:
         job = db.query(Job).filter(Job.id == job_id).first()
@@ -170,38 +155,39 @@ def update_job(job_id: str = typer.Argument(..., help="ID of the job to update")
 
         console.print(f"Updating job: [bold]{job.company} — {job.title}[/bold]\nPress Enter to keep current value.\n")
 
-        # Update basic fields
-        _prompt_update_basic_fields(job)
-
-        # Validate updates using JobUpdate schema (salary_range normalization/validation)
+        # Prompt user for updates
+        company = typer.prompt("Company", default=job.company)
+        title = typer.prompt("Title", default=job.title)
+        source = typer.prompt("Source", default=job.source or "")
+        job_url = typer.prompt("Job URL", default=job.job_url or "")
+        location = typer.prompt("Location", default=job.location or "")
+        salary_range = typer.prompt("Salary Range", default=job.salary_range or "")
+        applied_input = typer.prompt(
+            "Applied Date (YYYY-MM-DD)",
+            default=job.applied_date.strftime("%Y-%m-%d") if job.applied_date else ""
+        )
         try:
-            job_up = JobUpdate(
-                company=job.company,
-                title=job.title,
-                location=job.location,
-                salary_range=job.salary_range,
-                job_url=job.job_url,
-                source=job.source,
-            )
-        except ValidationError as exc:
-            console.print(f"[red]Invalid update:[/red] {exc}")
-            raise typer.Exit(code=1)
+            applied_dt = datetime.strptime(applied_input.strip(), "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        except ValueError:
+            applied_dt = job.applied_date
 
-        # Apply any normalized values (e.g., salary_range)
-        if job_up.salary_range is not None:
-            job.salary_range = job_up.salary_range
-        # Ensure job_url gets stored as a string (JobUpdate may contain a HttpUrl)
-        if job_up.job_url is not None:
-            job.job_url = str(job_up.job_url)
-
-        # Update Resume
+        # Resume & Cover Letter
         _prompt_update_resume(db, job)
-
-        # Update Cover Letter
         _prompt_update_cover_letter(db, job)
 
-        job.last_updated = datetime.now(timezone.utc)
-        _commit_job(db, job)
+        job = core_update_job(
+            db,
+            job,
+            company=company,
+            title=title,
+            source=source,
+            job_url=job_url,
+            location=location,
+            salary_range=salary_range,
+            applied_date=applied_dt,
+            resume_id=job.resume_id,
+            cover_letter_id=job.cover_letter_id
+        )
 
         console.print(f"\nUpdated job [bold]{job.company} — {job.title}[/bold]")
         if job.resume:
@@ -215,20 +201,18 @@ def update_job(job_id: str = typer.Argument(..., help="ID of the job to update")
 def list_jobs():
     """List all tracked job applications"""
     with get_db() as db:
-        # Eager-load related Resume and CoverLetter so we can access their
-        # attributes after the session is closed.
-        jobs = (
-            db.query(Job)
-            .options(joinedload(Job.resume), joinedload(Job.cover_letter))
-            .order_by(Job.created_at.desc())
-            .all()
-        )
+        jobs = core_list_jobs(db)
 
     if not jobs:
         console.print("No jobs tracked yet.")
         return
 
-    table = Table(title="Tracked Job Applications", box=box.SQUARE, show_lines=True, header_style="bold cyan")
+    table = Table(
+        title="Tracked Job Applications",
+        box=box.SQUARE,
+        show_lines=True,
+        header_style="bold cyan"
+    )
 
     table.add_column("ID", no_wrap=True)
     table.add_column("Company")
@@ -257,8 +241,8 @@ def list_jobs():
             job.job_url or "-",
         )
 
-    # Print the table once after all rows are added
     console.print(table)
+
 
 
 def _prompt_update_basic_fields(job: Job) -> None:
@@ -315,16 +299,10 @@ def _prompt_update_cover_letter(db, job: Job) -> None:
 def remove_job(job_id: str = typer.Argument(...)):
     """Remove a job from tracking"""
     with get_db() as db:
-        job = db.query(Job).filter(Job.id == job_id).first()
+        job = core_delete_job(db, job_id)
         if not job:
             console.print(f"Job ID {job_id} not found")
             raise typer.Exit()
-        try:
-            db.delete(job)
-            db.commit()
-        except Exception:
-            db.rollback()
-            raise
         console.print(f"Removed job [bold]{job.company} — {job.title}[/bold]")
 
 
