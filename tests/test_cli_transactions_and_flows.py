@@ -106,7 +106,7 @@ def test_cli_add_status_remove_flow(session, runner):
 
     job = session.query(Job).filter(Job.id == job_id).first()
     assert job is not None
-    assert job.status.value == "interview"
+    assert job.status.value == "1st_interview"
 
     # Remove
     result3 = runner.invoke(app, ["job", "remove", job_id])
