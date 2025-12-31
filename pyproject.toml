@@ -17,9 +17,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jobtracker"
-version = "0.0.0"
+version = "0.1.0"
 description = "Simple CLI for tracking job applications"
 readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.10"
 dependencies = [
   "typer",
@@ -29,7 +30,7 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://example.com/jobtracker"
+"Homepage" = "https://github.com/cdickson72/JOB_TRACKER"
 
 [project.scripts]
 # Installable CLI entry point: `jobtracker` command -> runs Typer app
