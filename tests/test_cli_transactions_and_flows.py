@@ -101,7 +101,7 @@ def test_cli_add_status_remove_flow(session, runner):
     job_id = m.group(1)
 
     # Status change
-    result2 = runner.invoke(app, ["job", "status", job_id, "interview"])
+    result2 = runner.invoke(app, ["job", "status", job_id, "1st_interview"])
     assert result2.exit_code == 0
 
     job = session.query(Job).filter(Job.id == job_id).first()
