@@ -17,7 +17,7 @@ def test_resume_add_update_remove_flow(session, runner, tmp_path):
     p.write_text("resume 1")
 
     # Add
-    result = runner.invoke(app, ["resume", "add", "--name", "MyRes", "--file-path", str(p), "--tags", "x"]) 
+    result = runner.invoke(app, ["resume", "add", "--name", "MyRes", "--file-path", str(p), "--tags", "x"])
     assert result.exit_code == 0, result.stdout
     m = re.search(r"ID:\s*([0-9a-fA-F-]{36})", result.stdout)
     assert m, f"Could not find ID in output: {result.stdout}"
@@ -50,7 +50,7 @@ def test_cannot_remove_resume_in_use(session, runner, tmp_path):
     p.write_text("resume in use")
 
     # Add resume
-    result = runner.invoke(app, ["resume", "add", "--name", "InUseR", "--file-path", str(p), "--tags", "a"]) 
+    result = runner.invoke(app, ["resume", "add", "--name", "InUseR", "--file-path", str(p), "--tags", "a"])
     assert result.exit_code == 0, result.stdout
     m = re.search(r"ID:\s*([0-9a-fA-F-]{36})", result.stdout)
     r_id = m.group(1)

@@ -47,7 +47,9 @@ def test_cover_letter_add_update_remove_flow(session, runner, tmp_path):
     # Update (change name and tags and file path)
     p2 = tmp_path / "cl2.txt"
     p2.write_text("cover letter 2")
-    result2 = runner.invoke(app, ["cover-letter", "update", cl_id, "--name", "MyCL2", "--tags", "tag3", "--file-path", str(p2)])
+    result2 = runner.invoke(
+        app, ["cover-letter", "update", cl_id, "--name", "MyCL2", "--tags", "tag3", "--file-path", str(p2)]
+    )
     assert result2.exit_code == 0, result2.stdout
 
     # Ensure the test session sees committed changes from the CLI invocation
@@ -71,7 +73,7 @@ def test_cannot_remove_cover_letter_in_use(session, runner, tmp_path):
     p.write_text("cover letter in use")
 
     # Add cover letter
-    result = runner.invoke(app, ["cover-letter", "add", "--name", "InUse", "--file-path", str(p), "--tags", "a"]) 
+    result = runner.invoke(app, ["cover-letter", "add", "--name", "InUse", "--file-path", str(p), "--tags", "a"])
     assert result.exit_code == 0, result.stdout
     m = re.search(r"ID:\s*([0-9a-fA-F-]{36})", result.stdout)
     cl_id = m.group(1)
