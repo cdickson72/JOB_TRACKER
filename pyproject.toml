@@ -20,7 +20,8 @@ name = "jobtracker"
 version = "0.1.0"
 description = "Simple CLI for tracking job applications"
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = [
   "typer",
@@ -28,6 +29,10 @@ dependencies = [
   "SQLAlchemy>=1.4",
   "pydantic",
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["*.db", "jobtracker.db", "__pycache__"]
 
 [project.urls]
 "Homepage" = "https://github.com/cdickson72/JOB_TRACKER"
