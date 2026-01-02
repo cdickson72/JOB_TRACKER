@@ -21,7 +21,7 @@ pip install jobtracker
 ## Usage
 ```bash
 # Add a new job application
-jobtracker job add 
+jobtracker job add
 
 # List all applications
 jobtracker job list
