@@ -11,3 +11,5 @@ class JobStatus(str, enum.Enum):
     OFFER = "offer"
     REJECTED = "rejected"
     GHOSTED = "ghosted"
+    SCAM = "scam"
+    DECLINED = "declined"
