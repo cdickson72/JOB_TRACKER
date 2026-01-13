@@ -14,8 +14,27 @@ This project is maintained as a **personal portfolio example** and is not intend
 - Simple command-line interface
 
 ## Installation
+
+### Install from GitHub Releases (recommended)
+
+Download the latest release artifact from the GitHub Releases page:
+
+https://github.com/cdickson72/JOB_TRACKER/releases
+
+Choose one of the following:
+- `jobtracker-<version>-py3-none-any.whl` (recommended)
+- `jobtracker-<version>.tar.gz`
+
+Install using pip:
+
 ```bash
-pip install jobtracker
+pip install jobtracker-0.1.0-py3-none-any.whl
+```
+
+Or install from the source archive:
+
+```bash
+pip install jobtracker-0.1.0.tar.gz
 ```
 
 ## Usage
@@ -38,10 +57,10 @@ jobtracker job remove <id>
 # Add a new resume
 jobtracker resume add
 
-# List all new resume
+# List all new resumes
 jobtracker resume list
 
-# Add a new cover letter
+# Add a new cover letters
 jobtracker cover-letter add
 
 # List all new cover letter
@@ -60,35 +79,35 @@ jobtracker note list <id>
 
 1. **Create and activate a virtual environment (recommended):**
 ```bash
-   python -m venv .venv
-   source .venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate
 ```
 
 2. **Install the package and test/dev extras:**
 ```bash
-   python -m pip install --upgrade pip
-   pip install -e '.[test,dev]'
+python -m pip install --upgrade pip
+pip install -e '.[test,dev]'
 ```
 
 3. **Install the pre-commit hooks** (runs Black, Ruff, and basic checks):
 ```bash
-   pre-commit install
+pre-commit install
 ```
 
 4. **Run all hooks and auto-fix where supported:**
 ```bash
-   pre-commit run --all-files
+pre-commit run --all-files
 ```
 
 5. **Run tests:**
 ```bash
-   pytest -q
+pytest -q
 ```
 
 6. **Lint or format manually:**
 ```bash
-   ruff check . --fix
-   black .
+ruff check . --fix
+black .
 ```
 
 ## CI/CD & Quality Gates
@@ -121,8 +140,8 @@ Merges are blocked if quality gates fail.
 
 ## License
 
-MIT
+This project is licensed under the MIT License.
 
 ## Contact
 
-cam_stacy@yahoo.com
+GitHub: https://github.com/cdickson72
